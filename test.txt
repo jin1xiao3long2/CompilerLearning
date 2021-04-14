@@ -1,0 +1,13 @@
+int main(){
+    int i = 0;
+    printf("%d\n",i);
+    if(i == 0){//abc
+        i++;/*  haha*/
+    }
+    /*yeyeye
+    lala
+    *
+    //
+    */
+    return 0;
+}

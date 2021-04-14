@@ -1,0 +1,6 @@
+C:/CPP/2020_5/Compiler/Experience/Tiny/build/CMakeFiles/tinyLexer.dir
+C:/CPP/2020_5/Compiler/Experience/Tiny/build/CMakeFiles/tinyParser.dir
+C:/CPP/2020_5/Compiler/Experience/Tiny/build/CMakeFiles/tinyscan.dir
+C:/CPP/2020_5/Compiler/Experience/Tiny/build/CMakeFiles/tiny.dir
+C:/CPP/2020_5/Compiler/Experience/Tiny/build/CMakeFiles/edit_cache.dir
+C:/CPP/2020_5/Compiler/Experience/Tiny/build/CMakeFiles/rebuild_cache.dir
