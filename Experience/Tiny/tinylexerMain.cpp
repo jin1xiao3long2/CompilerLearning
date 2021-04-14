@@ -58,7 +58,7 @@ void get_write_filename(const std::string &filename, std::string &write_filename
     int n = filename.find('\\');
     std::string prefix;
     if (n != std::string::npos)
-        prefix = filename.substr(n, filename.find('.'));
+        prefix = filename.substr(n, filename.rfind('.'));
     else
         prefix = filename.substr(0, filename.find('.'));
     write_filename = prefix + ".txt";
