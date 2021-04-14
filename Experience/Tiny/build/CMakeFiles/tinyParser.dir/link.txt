@@ -1,2 +1,0 @@
-C:\BC\C\mingw64\bin\ar.exe qc libtinyParser.a  CMakeFiles/tinyParser.dir/Tiny_Nodes.cpp.obj CMakeFiles/tinyParser.dir/Tiny_Parser.cpp.obj
-C:\BC\C\mingw64\bin\ranlib.exe libtinyParser.a

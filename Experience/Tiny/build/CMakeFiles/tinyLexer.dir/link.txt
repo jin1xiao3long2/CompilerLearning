@@ -1,2 +1,0 @@
-C:\BC\C\mingw64\bin\ar.exe qc libtinyLexer.a  CMakeFiles/tinyLexer.dir/Tiny_Lexer.cpp.obj CMakeFiles/tinyLexer.dir/Tiny_Signal.cpp.obj
-C:\BC\C\mingw64\bin\ranlib.exe libtinyLexer.a

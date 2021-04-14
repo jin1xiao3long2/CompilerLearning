@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\tiny.dir/objects.a
-C:\BC\C\mingw64\bin\ar.exe cr CMakeFiles\tiny.dir/objects.a @CMakeFiles\tiny.dir\objects1.rsp
-C:\BC\C\mingw64\bin\g++.exe    -Wl,--whole-archive CMakeFiles\tiny.dir/objects.a -Wl,--no-whole-archive  -o tiny.exe -Wl,--out-implib,libtiny.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\tiny.dir\linklibs.rsp

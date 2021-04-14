@@ -28,6 +28,10 @@ public:
 int get_info(std::string &sp, const std::string &filename, std::vector<tn::token_base *> &lineinfo) {
     std::fstream fs;
     fs.open(filename, std::ios::in);
+    if(fs.fail()){
+        std::cerr << "file open failed, please check parameters";
+        exit(-1);
+    }
     bool newline = false;
     int l = 0;
     while (!fs.eof()) {
