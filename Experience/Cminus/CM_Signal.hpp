@@ -1,10 +1,4 @@
 #pragma once
-
-//
-// Created by XM on 2021/3/24.
-//
-
-#pragma once
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>

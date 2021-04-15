@@ -31,5 +31,9 @@
 *.out
 *.app
 
+# My compress file
+*.zip
+*.7z
+
 # Cmake Dirctory
 cmake-build-debug/

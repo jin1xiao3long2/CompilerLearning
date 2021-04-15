@@ -68,7 +68,7 @@ void get_write_filename(const std::string &filename, std::string &write_filename
     write_filename = prefix + ".txt";
 }
 
-void write_syntax_tree(const std::deque<tn::token_base *> &tokens, const std::string &write_filename) {
+void write_tokens(const std::deque<tn::token_base *> &tokens, const std::string &write_filename) {
     std::fstream fs;
     fs.open(write_filename, std::ios::out);
     for (auto iter = tokens.begin(); iter != tokens.end(); iter++) {
@@ -139,7 +139,7 @@ int main(int argc, char **argv) {
     std::string writeFilename;
     get_write_filename(filename, writeFilename);
 //write into files
-    write_syntax_tree(show_tokens, writeFilename);
+    write_tokens(show_tokens, writeFilename);
 
     return 0;
 }

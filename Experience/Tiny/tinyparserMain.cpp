@@ -76,17 +76,17 @@ int main(int argc, char **argv) {
 
 
     //parse
-//    tn::Parser *parser = new tn::Parser(tokens);
-//    parser->parse();
+    tn::Parser *parser = new tn::Parser(tokens);
+    parser->parse();
 
 
     //get string
-//    std::deque<std::string> mes = parser->getMessages();
+    std::deque<std::string> mes = parser->getMessages();
 
     //write into files
     std::string writeFilename;
     get_write_filename(filename, writeFilename);
-//    write_syntax_tree(mes, writeFilename);
+    write_syntax_tree(mes, writeFilename);
     std::cout << "filename is " << writeFilename << std::endl;
     return 0;
 }
