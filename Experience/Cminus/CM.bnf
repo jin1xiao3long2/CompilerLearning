@@ -22,7 +22,9 @@
  param ::= type_specifier ID ( '[' ']' )? ;
   
  compound_stmt ::= '{' (var_declaration)* (statement)* '}' ;
-  
+
+  var_declaration ::= type_specifier ID ('[' NUM ']')? ;
+
  statement ::= expression_stmt
                      | compound_stmt
                      | selection_stmt

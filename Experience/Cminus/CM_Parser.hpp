@@ -109,15 +109,15 @@ namespace cm {
 
         token_base * consume_token();
 
-        bool match_type(token_type);
+        bool match(token_type);
 
         token_base *consume_token(token_type);
 
-        bool match_signal(signal_type);
+        bool match(signal_type);
 
         token_base * consume_token(signal_type);
 
-        bool match_keyword(keyword_type);
+        bool match(keyword_type);
 
         token_base * consume_token(keyword_type);
 
@@ -138,6 +138,8 @@ namespace cm {
         node_param *Parse_param();
 
         node_compound_stmt *Parse_compound_stmt();
+
+        node_var_declaration *Parse_var_declaration();
 
         node_statement *Parse_statement();
 
@@ -179,7 +181,8 @@ namespace cm {
             delete start;
         }
 
-        void Eval(){
+        void Parse(){
+            start = Parse_program();
             start->Eval(0, messages);
         }
 

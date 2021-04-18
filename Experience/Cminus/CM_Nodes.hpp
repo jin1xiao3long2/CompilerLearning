@@ -7,7 +7,7 @@
 
 namespace cm {
 
-    //
+
     struct node_base {
         virtual void Eval(int, std::deque<std::string> *) = 0;
 
@@ -104,6 +104,7 @@ namespace cm {
             delete ID;
             delete LEFT_S;
             delete RIGHT_S;
+            COMMA->clear();
             delete COMMA;
             param->clear();
             delete param;
@@ -115,7 +116,7 @@ namespace cm {
         token_base *ID{};
         token_base *LEFT_S{};
         token_base *RIGHT_S{};
-        token_base *SEMICOLON{};
+        std::deque<token_base *> *COMMA{};
         std::deque<node_base *> *param{};
 
         void Eval(int, std::deque<std::string> *) override;
@@ -125,7 +126,8 @@ namespace cm {
             delete ID;
             delete LEFT_S;
             delete RIGHT_S;
-            delete SEMICOLON;
+            COMMA->clear();
+            delete COMMA;
             param->clear();
             delete param;
         }
@@ -162,6 +164,24 @@ namespace cm {
             delete var_declaration;
             statement->clear();
             delete statement;
+        }
+    };
+
+    struct node_var_declaration final : node_base{
+        node_type_specifier* type_specifier{};
+        token_base* ID{};
+        token_base* LEFT_S{};
+        token_base* NUMBER{};
+        token_base* RIGHT_S{};
+
+        void Eval(int, std::deque<std::string> *) override;
+
+        ~node_var_declaration(){
+            delete type_specifier;
+            delete ID;
+            delete LEFT_S;
+            delete NUMBER;
+            delete RIGHT_S;
         }
     };
 

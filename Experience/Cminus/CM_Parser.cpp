@@ -52,14 +52,14 @@ namespace cm {
         return value;
     }
 
-    bool Parser::match_type(token_type type) {
+    bool Parser::match(token_type type) {
         Ensure();
         token_base *value = tokens.front();
         return value->get_type() == type;
     }
 
     token_base *Parser::consume_token(token_type type) {
-        if (match_type(type)) {
+        if (match(type)) {
             return consume_token();
         } else {
             add_message("unexpected type");
@@ -67,14 +67,14 @@ namespace cm {
         }
     }
 
-    bool Parser::match_signal(signal_type signal) {
-        match_type(token_type::signal_type);
+    bool Parser::match(signal_type signal) {
+        match(token_type::signal_type);
         token_base *value = tokens.front();
         return reinterpret_cast<token_signal *>(value)->get_value() == signal;
     }
 
     token_base *Parser::consume_token(signal_type signal) {
-        if (match_signal(signal)) {
+        if (match(signal)) {
             return consume_token();
         } else {
             add_message("unexpected signal");
@@ -82,14 +82,14 @@ namespace cm {
         }
     }
 
-    bool Parser::match_keyword(keyword_type keyword) {
-        match_type(token_type::keyword_type);
+    bool Parser::match(keyword_type keyword) {
+        match(token_type::keyword_type);
         token_base *value = tokens.front();
         return reinterpret_cast<token_keyword *>(value)->get_value() == keyword;
     }
 
     token_base *Parser::consume_token(keyword_type keyword) {
-        if (match_keyword(keyword)) {
+        if (match(keyword)) {
             return consume_token();
         } else {
             add_message("unexpected keyword");
@@ -159,6 +159,7 @@ namespace cm {
                         break;
                     }
                 }
+                break;
             }
             default:{
                 consume_error();
@@ -181,18 +182,19 @@ namespace cm {
                         //VOID | INT
                         return typeSpecifier;
                     }
-
                     default:{
                         consume_error();
                         break;
                     }
                 }
+                break;
             }
             default:{
                 consume_error();
                 break;
             }
         }
+        return typeSpecifier;
     }
 
     node_params *Parser::Parse_params() {
@@ -216,6 +218,7 @@ namespace cm {
                         break;
                     }
                 }
+                break;
             }
             default:{
                 consume_error();
@@ -246,45 +249,175 @@ namespace cm {
                                 //']'
                                 break;
                             }
-                            case signal_type::COMMA:{
-                                break;
-                            }
                             default:{
                                 break;
                             }
                         }
+                        break;
                     }
                     default:{
                         break;
                     }
                 }
-                bool break_while = false;
+                //('[' ']')?
+
                 while(!Is_end()){
-                    if(match_signal(signal_type::COMMA)){
+                    if(match(signal_type::COMMA)){
                         voidParamList->COMMA->push_back(consume_token());
                         //','
                         voidParamList->param->push_back(Parse_param());
                         //param
                     }else{
-                        break_while = true;
+                        break;
                     }
-                    if(break_while)
-                        break;;
+
                 }
+                //(',' param)*
+                break;
+            }
+            default:{
+                break;
             }
         }
+        //(ID ('[' ']')? (',' param)* )?
+        return voidParamList;
     }
 
     node_int_param_list *Parser::Parse_int_param_list() {
+        node_int_param_list *intParamList = new node_int_param_list;
 
+        intParamList->INT = consume_token(keyword_type::INT);
+        //INT
+        intParamList->ID = consume_token(token_type::identifier_type);
+        //ID
+
+        switch (peek()) {
+            case token_type::signal_type:{
+                switch (peek_signal()) {
+                    case signal_type::LEFT_S:{
+                        intParamList->LEFT_S = consume_token();
+                        //'['
+                        intParamList->RIGHT_S = consume_token(signal_type::RIGHT_S);
+                        //']'
+                    }
+                    default:{
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        //('[' ']')?
+
+        while(!Is_end()){
+            if(match(signal_type::COMMA)){
+                intParamList->COMMA->push_back(consume_token());
+                //','
+                intParamList->param->push_back(Parse_param());
+                //param
+            }else{
+                break;
+            }
+        }
+        //(',' param)?
+
+        return intParamList;
     }
 
     node_param *Parser::Parse_param() {
+        node_param *param = new node_param;
 
+        param->type_specifier = Parse_type_speicifier();
+        //type_specifier
+        param->ID = consume_token(token_type::identifier_type);
+        //ID
+        switch (peek()) {
+            case token_type::signal_type:{
+                switch (peek_signal()) {
+                    case signal_type::LEFT_S: {
+                        param->LEFT_S = consume_token();
+                        //'['
+                        param->RIGHT_S = consume_token(signal_type::RIGHT_S);
+                        //']'
+                        break;
+                    }
+                    default:{
+                        break;
+                    }
+                }
+                break;
+            }
+            default:{
+                break;
+            }
+        }
+        //('[' ']')?
+
+        return param;
     }
 
     node_compound_stmt *Parser::Parse_compound_stmt() {
+        node_compound_stmt *compoundStmt = new node_compound_stmt;
 
+        compoundStmt->LEFT_B = consume_token(signal_type::LEFT_B);
+        //'{'
+        while(!Is_end()){
+            if(match(keyword_type::INT) || match(keyword_type::VOID)){
+                compoundStmt->var_declaration->push_back(Parse_var_declaration());
+            }else{
+                break;
+            }
+        }
+        //(var_declaration)*
+        while(!Is_end()){
+            if(match(token_type::identifier_type) || match(signal_type::LEFT_P)
+            || match(token_type::number_type)    || match(signal_type::LEFT_B)
+            || match(keyword_type::IF)                 || match(keyword_type::WHILE)
+            || match(keyword_type::RETURN)){
+                compoundStmt->statement->push_back(Parse_statement());
+            }else{
+                break;
+            }
+            //(statement)*
+        }
+        compoundStmt->RIGHT_B = consume_token(signal_type::RIGHT_B);
+        //'}'
+
+        return compoundStmt;
+    }
+
+    node_var_declaration *Parser::Parse_var_declaration() {
+        node_var_declaration *varDeclaration = new node_var_declaration;
+
+        varDeclaration->type_specifier = Parse_type_speicifier();
+        //type_specifier
+        varDeclaration->ID = consume_token(token_type::identifier_type);
+        //ID
+        switch (peek()) {
+            case token_type::signal_type:{
+                switch (peek_signal()) {
+                    case signal_type::LEFT_S:{
+                        varDeclaration->LEFT_S = consume_token();
+                        //'['
+                        varDeclaration->NUMBER = consume_token(token_type::number_type);
+                        //NUM
+                        varDeclaration->RIGHT_S = consume_token(signal_type::RIGHT_S);
+                        //']'
+                        break;
+                    }
+                    default:{
+                        break;
+                    }
+                }
+                break;
+            }
+            default:{
+                break;
+            }
+        }
+        //('[' NUM ']')?
+
+        return varDeclaration;
     }
 
     node_statement *Parser::Parse_statement() {
