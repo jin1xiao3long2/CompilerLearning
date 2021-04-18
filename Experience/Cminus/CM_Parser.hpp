@@ -1,9 +1,9 @@
 /*
  *  program ::= declaration  (declaration)* ;
  *
- *  declaration ::= type_specifier ID declaration' ;
+ *  declaration ::= type_specifier ID declaration_s;
  *
- *  declaration' ::= ';'
+ *  declaration_s ::= ';'
  *                        | '[' NUM ']' ';'
  *                        | '(' params ')' compound_stmt
  *                        ;
@@ -60,11 +60,11 @@
  * mulop ::= '*' | '/' ;
  *
  * factor ::= '(' expression ')'
- *               | ID factor'
+ *               | ID factor_s
  *               | NUM
  *               ;
  *
- * factor' ::= '[' expression ']'
+ * factor_s ::= '[' expression ']'
  *                | '(' args ')'
  *                | NULL
  *                ;
@@ -73,3 +73,118 @@
  *            | NULL
  *            ;
  */
+
+
+#pragma once
+
+#include <CM_Nodes.hpp>
+
+
+namespace cm {
+
+
+    class Parser final {
+
+    private:
+
+        std::deque<token_base *> tokens;
+        std::deque<std::string> *messages;
+        node_base *start = nullptr;
+
+        const std::string get_token_info() const;
+
+        void add_message(const std::string &);
+
+        void consume_error();
+
+        bool Is_end();
+
+        void Ensure();
+
+        token_type peek();
+
+        signal_type peek_signal();
+
+        keyword_type peek_keyword();
+
+        token_base * consume_token();
+
+        bool match_type(token_type);
+
+        token_base *consume_token(token_type);
+
+        bool match_signal(signal_type);
+
+        token_base * consume_token(signal_type);
+
+        bool match_keyword(keyword_type);
+
+        token_base * consume_token(keyword_type);
+
+        node_program *Parse_program();
+
+        node_declaration *Parse_declaration();
+
+        node_declaration_s *Parse_declaration_s();
+
+        node_type_specifier *Parse_type_speicifier();
+
+        node_params *Parse_params();
+
+        node_void_param_list *Parse_void_param_list();
+
+        node_int_param_list *Parse_int_param_list();
+
+        node_param *Parse_param();
+
+        node_compound_stmt *Parse_compound_stmt();
+
+        node_statement *Parse_statement();
+
+        node_expression_stmt *Parse_expression_stmt();
+
+        node_selection_stmt *Parse_selection_stmt();
+
+        node_iteration_stmt *Parse_iteration_stmt();
+
+        node_return_stmt *Parse_return_stmt();
+
+        node_expression *Parse_expression();
+
+        node_var *Parse_var();
+
+        node_simple_expression *Parse_simple_expression();
+
+        node_relop *Parse_relop();
+
+        node_additive_expression *Parse_additive_expression();
+
+        node_addop *Parse_addop();
+
+        node_term *Parse_term();
+
+        node_mulop *Parse_mulop();
+
+        node_factor *Parse_factor();
+
+        node_factor_s *Parse_factor_s();
+
+        node_base * Parse_args();
+
+    public:
+
+        Parser(const std::deque<token_base *> &Tokens) : tokens(std::move(Tokens)) {}
+
+        ~Parser(){
+            delete start;
+        }
+
+        void Eval(){
+            start->Eval(0, messages);
+        }
+
+        std::deque<std::string> *getMessages() const;
+    };
+
+
+}

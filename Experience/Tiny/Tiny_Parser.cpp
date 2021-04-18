@@ -19,7 +19,6 @@ namespace tn {
     void Parser::Ensure() {
         if (IsEnd()) //error happened
         {
-            lineNum++;
             addMessage("unexpected token -> EOF");
         }
     }
@@ -56,7 +55,7 @@ namespace tn {
         return true;
     }
 
-    token_base *Parser::consume_type(token_type type) {
+    token_base *Parser::consume_token(token_type type) {
         token_base *token = nullptr;
         if (!match_type(type)) {
             addMessage("unexpected token -> " + tokens.front()->get_show_info());
@@ -246,7 +245,7 @@ namespace tn {
 
     node_Assign_stmt *Parser::Parse_Assign_stmt() {
         node_Assign_stmt *assignStmt = new node_Assign_stmt;
-        assignStmt->Identifier = consume_type(token_type::identifier_type);
+        assignStmt->Identifier = consume_token(token_type::identifier_type);
         assignStmt->Assign = consume_token(signal_type::ASSIGN);
         assignStmt->Exp = Parse_Exp();
         return assignStmt;
@@ -256,7 +255,7 @@ namespace tn {
         node_Read_stmt *readStmt = new node_Read_stmt;
         readStmt->Read = consume_token();
 
-        readStmt->Identifier = consume_type(token_type::identifier_type);
+        readStmt->Identifier = consume_token(token_type::identifier_type);
         return readStmt;
     }
 
@@ -326,7 +325,7 @@ namespace tn {
 
     node_AddOp *Parser::Parse_AddOp() {
         node_AddOp *addOp = new node_AddOp;
-        addOp->AddOp = consume_type(token_type::signal_type);
+        addOp->AddOp = consume_token(token_type::signal_type);
         return addOp;
     }
 
@@ -363,7 +362,7 @@ namespace tn {
 
     node_MulOp *Parser::Parse_MulOp() {
         node_MulOp *mulOp = new node_MulOp;
-        mulOp->MulOp = consume_type(token_type::signal_type);
+        mulOp->MulOp = consume_token(token_type::signal_type);
         return mulOp;
     }
 
@@ -377,11 +376,11 @@ namespace tn {
                 break;
             }
             case token_type::number_type: {
-                factor->Number = consume_type(token_type::number_type);
+                factor->Number = consume_token(token_type::number_type);
                 break;
             }
             case token_type::identifier_type: {
-                factor->Identifier = consume_type(token_type::identifier_type);
+                factor->Identifier = consume_token(token_type::identifier_type);
                 break;
             }
             default: {

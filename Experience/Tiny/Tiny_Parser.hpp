@@ -89,7 +89,7 @@ namespace tn {
 
         bool match_type(token_type type);
 
-        token_base *consume_type(token_type type);
+        token_base *consume_token(token_type type);
 
         bool match_keyword(keyword_type keyword);
 
