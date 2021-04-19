@@ -574,7 +574,9 @@ namespace cm {
     }
 
     node_iteration_stmt *Parser::Parse_iteration_stmt() {
+        node_iteration_stmt *iterationStmt = new node_iteration_stmt;
 
+        return iterationStmt;
     }
 
     node_return_stmt *Parser::Parse_return_stmt() {
