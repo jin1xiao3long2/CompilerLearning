@@ -6,9 +6,11 @@
 
 namespace cm {
 
-    const std::string Parser::get_token_info() const{
-        token_base* token = tokens.front();
-        return std::string("line: " + std::to_string(token->get_line()) + " column: " + std::to_string(token->get_column()) + token->get_show_info());
+    const std::string Parser::get_token_info() const {
+        token_base *token = tokens.front();
+        return std::string(
+                "line: " + std::to_string(token->get_line()) + " column: " + std::to_string(token->get_column()) +
+                token->get_show_info());
     }
 
     void Parser::add_message(const std::string &mes) {
@@ -127,14 +129,14 @@ namespace cm {
         node_declaration_s *declarationS = new node_declaration_s;
 
         switch (peek()) {
-            case token_type::signal_type:{
+            case token_type::signal_type: {
                 switch (peek_signal()) {
-                    case signal_type::SEMICOLON:{
+                    case signal_type::SEMICOLON: {
                         declarationS->SEMICOLON = consume_token();
                         //';'
                         break;
                     }
-                    case signal_type::LEFT_S:{
+                    case signal_type::LEFT_S: {
                         declarationS->LEFT_S = consume_token();
                         //'['
                         declarationS->NUMBER = consume_token(token_type::number_type);
@@ -143,7 +145,7 @@ namespace cm {
                         //']'
                         break;
                     }
-                    case signal_type::LEFT_P:{
+                    case signal_type::LEFT_P: {
                         declarationS->LEFT_P = consume_token();
                         //'('
                         declarationS->params = Parse_params();
@@ -154,14 +156,14 @@ namespace cm {
                         //compound_stmt
                         break;
                     }
-                    default:{
+                    default: {
                         consume_error();
                         break;
                     }
                 }
                 break;
             }
-            default:{
+            default: {
                 consume_error();
                 break;
             }
@@ -173,23 +175,23 @@ namespace cm {
         node_type_specifier *typeSpecifier = nullptr;
 
         switch (peek()) {
-            case token_type::signal_type:{
+            case token_type::signal_type: {
                 switch (peek_keyword()) {
                     case keyword_type::INT:
-                    case keyword_type::VOID:{
+                    case keyword_type::VOID: {
                         typeSpecifier = new node_type_specifier;
                         typeSpecifier->TYPE = consume_token();
                         //VOID | INT
                         return typeSpecifier;
                     }
-                    default:{
+                    default: {
                         consume_error();
                         break;
                     }
                 }
                 break;
             }
-            default:{
+            default: {
                 consume_error();
                 break;
             }
@@ -201,26 +203,26 @@ namespace cm {
         node_params *params = new node_params;
 
         switch (peek()) {
-            case token_type::keyword_type:{
+            case token_type::keyword_type: {
                 switch (peek_keyword()) {
-                    case keyword_type::VOID:{
+                    case keyword_type::VOID: {
                         params->void_param_list = Parse_void_param_list();
                         //void_param_list
                         break;
                     }
-                    case keyword_type::INT:{
+                    case keyword_type::INT: {
                         params->int_param_list = Parse_int_param_list();
                         //int_param_list
                         break;
                     }
-                    default:{
+                    default: {
                         consume_error();
                         break;
                     }
                 }
                 break;
             }
-            default:{
+            default: {
                 consume_error();
                 break;
             }
@@ -235,39 +237,39 @@ namespace cm {
         voidParamList->VOID = consume_token();
 
         switch (peek()) {
-            case token_type::identifier_type:{
+            case token_type::identifier_type: {
                 voidParamList->ID = consume_token();
                 //ID
 
                 switch (peek()) {
-                    case token_type::signal_type:{
+                    case token_type::signal_type: {
                         switch (peek_signal()) {
-                            case signal_type::LEFT_S:{
+                            case signal_type::LEFT_S: {
                                 voidParamList->LEFT_S = consume_token();
                                 //'['
                                 voidParamList->RIGHT_S = consume_token(signal_type::RIGHT_S);
                                 //']'
                                 break;
                             }
-                            default:{
+                            default: {
                                 break;
                             }
                         }
                         break;
                     }
-                    default:{
+                    default: {
                         break;
                     }
                 }
                 //('[' ']')?
 
-                while(!Is_end()){
-                    if(match(signal_type::COMMA)){
+                while (!Is_end()) {
+                    if (match(signal_type::COMMA)) {
                         voidParamList->COMMA->push_back(consume_token());
                         //','
                         voidParamList->param->push_back(Parse_param());
                         //param
-                    }else{
+                    } else {
                         break;
                     }
 
@@ -275,7 +277,7 @@ namespace cm {
                 //(',' param)*
                 break;
             }
-            default:{
+            default: {
                 break;
             }
         }
@@ -292,15 +294,15 @@ namespace cm {
         //ID
 
         switch (peek()) {
-            case token_type::signal_type:{
+            case token_type::signal_type: {
                 switch (peek_signal()) {
-                    case signal_type::LEFT_S:{
+                    case signal_type::LEFT_S: {
                         intParamList->LEFT_S = consume_token();
                         //'['
                         intParamList->RIGHT_S = consume_token(signal_type::RIGHT_S);
                         //']'
                     }
-                    default:{
+                    default: {
                         break;
                     }
                 }
@@ -309,13 +311,13 @@ namespace cm {
         }
         //('[' ']')?
 
-        while(!Is_end()){
-            if(match(signal_type::COMMA)){
+        while (!Is_end()) {
+            if (match(signal_type::COMMA)) {
                 intParamList->COMMA->push_back(consume_token());
                 //','
                 intParamList->param->push_back(Parse_param());
                 //param
-            }else{
+            } else {
                 break;
             }
         }
@@ -332,7 +334,7 @@ namespace cm {
         param->ID = consume_token(token_type::identifier_type);
         //ID
         switch (peek()) {
-            case token_type::signal_type:{
+            case token_type::signal_type: {
                 switch (peek_signal()) {
                     case signal_type::LEFT_S: {
                         param->LEFT_S = consume_token();
@@ -341,13 +343,13 @@ namespace cm {
                         //']'
                         break;
                     }
-                    default:{
+                    default: {
                         break;
                     }
                 }
                 break;
             }
-            default:{
+            default: {
                 break;
             }
         }
@@ -361,21 +363,21 @@ namespace cm {
 
         compoundStmt->LEFT_B = consume_token(signal_type::LEFT_B);
         //'{'
-        while(!Is_end()){
-            if(match(keyword_type::INT) || match(keyword_type::VOID)){
+        while (!Is_end()) {
+            if (match(keyword_type::INT) || match(keyword_type::VOID)) {
                 compoundStmt->var_declaration->push_back(Parse_var_declaration());
-            }else{
+            } else {
                 break;
             }
         }
         //(var_declaration)*
-        while(!Is_end()){
-            if(match(token_type::identifier_type) || match(signal_type::LEFT_P)
-            || match(token_type::number_type)    || match(signal_type::LEFT_B)
-            || match(keyword_type::IF)                 || match(keyword_type::WHILE)
-            || match(keyword_type::RETURN)){
+        while (!Is_end()) {
+            if (match(token_type::identifier_type) || match(signal_type::LEFT_P)
+                || match(token_type::number_type) || match(signal_type::LEFT_B)
+                || match(keyword_type::IF) || match(keyword_type::WHILE)
+                || match(keyword_type::RETURN) || match(signal_type::SEMICOLON)) {
                 compoundStmt->statement->push_back(Parse_statement());
-            }else{
+            } else {
                 break;
             }
             //(statement)*
@@ -394,15 +396,166 @@ namespace cm {
         varDeclaration->ID = consume_token(token_type::identifier_type);
         //ID
         switch (peek()) {
-            case token_type::signal_type:{
+            case token_type::signal_type: {
                 switch (peek_signal()) {
-                    case signal_type::LEFT_S:{
+                    case signal_type::LEFT_S: {
                         varDeclaration->LEFT_S = consume_token();
                         //'['
                         varDeclaration->NUMBER = consume_token(token_type::number_type);
                         //NUM
                         varDeclaration->RIGHT_S = consume_token(signal_type::RIGHT_S);
                         //']'
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        //('[' NUM ']')?
+
+        return varDeclaration;
+    }
+
+    node_statement *Parser::Parse_statement() {
+        node_statement *statement = new node_statement;
+
+        switch (peek()) {
+            case token_type::signal_type: {
+                switch (peek_signal()) {
+                    case signal_type::LEFT_P: {
+                        statement->express_stmt = Parse_expression_stmt();
+                        break;
+                    }
+                        //expression_stmt
+                    case signal_type::LEFT_B: {
+                        statement->compound_stmt = Parse_compound_stmt();
+                        break;
+                    }
+                        //compound_stmt
+                    case signal_type::SEMICOLON: {
+                        statement->express_stmt = Parse_expression_stmt();
+                        break;
+                    }
+                        //expression_stmt
+                    default: {
+                        consume_error();
+                        break;
+                    }
+                }
+                break;
+            }
+            case token_type::keyword_type: {
+                switch (peek_keyword()) {
+                    case keyword_type::IF: {
+                        statement->selection_stmt = Parse_selection_stmt();
+                        break;
+                    }
+                        //selection_stmt
+                    case keyword_type::WHILE: {
+                        statement->iteration_stmt = Parse_iteration_stmt();
+                        break;
+                    }
+                        //iteration_stmt
+                    case keyword_type::RETURN: {
+                        statement->return_stmt = Parse_return_stmt();
+                        break;
+                    }
+                        //return_stmt
+                    default: {
+                        consume_error();
+                        break;
+                    }
+                }
+                break;
+            }
+            case token_type::number_type:
+            case token_type::identifier_type: {
+                statement->express_stmt = Parse_expression_stmt();
+                break;
+            }
+                //expression_stmt
+            default: {
+                consume_error();
+                break;
+            }
+        }
+        return statement;
+    }
+
+    node_expression_stmt *Parser::Parse_expression_stmt() {
+        node_expression_stmt *expressionStmt = new node_expression_stmt;
+
+        bool need_semi = true;
+
+        switch (peek()) {
+            case token_type::signal_type: {
+                switch (peek_signal()) {
+                    case signal_type::LEFT_P: {
+                        expressionStmt->expression = Parse_expression();
+                        break;
+                    }
+                        //expression
+                    case signal_type::SEMICOLON: {
+                        expressionStmt->SEMICOLON = consume_token();
+                        need_semi = false;
+                        break;
+                    }
+                        //';'
+                    default: {
+                        consume_error();
+                        need_semi = false;
+                        break;
+                    }
+                }
+                break;
+            }
+            case token_type::number_type:
+            case token_type::identifier_type: {
+                expressionStmt->expression = Parse_expression();
+                break;
+            }
+                //expression
+            default: {
+                consume_error();
+                need_semi = false;
+                break;
+            }
+        }
+        if (need_semi) {
+            expressionStmt->SEMICOLON = consume_token(signal_type::SEMICOLON);
+        }
+        //';'
+
+        return expressionStmt;
+    }
+
+    node_selection_stmt *Parser::Parse_selection_stmt() {
+        node_selection_stmt *selectionStmt = new node_selection_stmt;
+
+        selectionStmt->IF = consume_token();
+        //IF
+        selectionStmt->LEFT_P = consume_token(signal_type::LEFT_P);
+        //'('
+        selectionStmt->expression = Parse_expression();
+        //expression
+        selectionStmt->RIGHT_P = consume_token(signal_type::RIGHT_P);
+        //')'
+        selectionStmt->statement_1 = Parse_statement();
+        //statement
+        switch (peek()) {
+            case token_type::keyword_type:{
+                switch (peek_keyword()) {
+                    case keyword_type::ELSE:{
+                        selectionStmt->ELSE = consume_token();
+                        //ELSE
+                        selectionStmt->statement_2 = Parse_statement();
+                        //statement
                         break;
                     }
                     default:{
@@ -415,21 +568,9 @@ namespace cm {
                 break;
             }
         }
-        //('[' NUM ']')?
+        //(ELSE statement)?
 
-        return varDeclaration;
-    }
-
-    node_statement *Parser::Parse_statement() {
-
-    }
-
-    node_expression_stmt *Parser::Parse_expression_stmt() {
-
-    }
-
-    node_selection_stmt *Parser::Parse_selection_stmt() {
-
+        return selectionStmt;
     }
 
     node_iteration_stmt *Parser::Parse_iteration_stmt() {
