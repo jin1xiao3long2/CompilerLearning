@@ -469,7 +469,7 @@ namespace cm {
 
     struct node_args final : node_base{
         node_base *expression_1{};
-        std::deque<token_base *> *SEMICOLON{};
+        std::deque<token_base *> *COMMA{};
         std::deque<node_base *> *expression{};
         node_base *empty{};
 
@@ -479,8 +479,8 @@ namespace cm {
 
         ~node_args() override{
             delete expression_1;
-            SEMICOLON->clear();
-            delete SEMICOLON;
+            COMMA->clear();
+            delete COMMA;
             expression->clear();
             delete expression;
             delete empty;

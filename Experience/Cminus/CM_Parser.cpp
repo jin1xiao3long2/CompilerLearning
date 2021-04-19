@@ -549,22 +549,22 @@ namespace cm {
         selectionStmt->statement_1 = Parse_statement();
         //statement
         switch (peek()) {
-            case token_type::keyword_type:{
+            case token_type::keyword_type: {
                 switch (peek_keyword()) {
-                    case keyword_type::ELSE:{
+                    case keyword_type::ELSE: {
                         selectionStmt->ELSE = consume_token();
                         //ELSE
                         selectionStmt->statement_2 = Parse_statement();
                         //statement
                         break;
                     }
-                    default:{
+                    default: {
                         break;
                     }
                 }
                 break;
             }
-            default:{
+            default: {
                 break;
             }
         }
@@ -595,26 +595,26 @@ namespace cm {
         returnStmt->RETURN = consume_token();
         //RETURN
         switch (peek()) {
-            case token_type::signal_type:{
+            case token_type::signal_type: {
                 switch (peek_signal()) {
-                    case signal_type::RIGHT_P:{
+                    case signal_type::RIGHT_P: {
                         returnStmt->expression = Parse_statement();
                         break;
                     }
-                    //statement
-                    default:{
+                        //statement
+                    default: {
                         break;
                     }
                 }
                 break;
             }
             case token_type::number_type:
-            case token_type::identifier_type:{
+            case token_type::identifier_type: {
                 returnStmt->expression = Parse_expression();
                 break;
             }
-            //expression
-            default:{
+                //expression
+            default: {
                 break;
             }
         }
@@ -630,93 +630,328 @@ namespace cm {
         bool check_var = false;
         //for look back, will be nullptr in the end
         switch (peek()) {
-            case token_type::signal_type:{
+            case token_type::signal_type: {
                 switch (peek_signal()) {
-                    case signal_type::LEFT_P:{
+                    case signal_type::LEFT_P: {
                         expression->simple_expression = Parse_simple_expression();
                         break;
                     }
-                    default:{//actually it is invalid code
+                        //simple_expression
+                    default: {//actually it is invalid code
                         consume_error();
                         break;
                     }
                 }
                 break;
             }
-            case token_type::number_type:{
+            case token_type::number_type: {
                 expression->simple_expression = Parse_simple_expression();
                 break;
             }
-            case token_type::identifier_type:{
-                 tmp_node = Parse_var();
-                 check_var = true;
-                 break;
+                //simple_expression
+            case token_type::identifier_type: {
+                tmp_node = Parse_var();
+                check_var = true;
+                break;
             }
-            default:{//actually it is invalid code
+            default: {//actually it is invalid code
                 consume_error();
                 break;
             }
         }
 
-        if(check_var){
-            if(match(signal_type::EQ)){
+        if (check_var) {
+            if (match(signal_type::EQ)) {
                 expression->var = tmp_node;
+                //var
                 tmp_node = nullptr;
                 expression->EQ = consume_token();
+                //'='
                 expression->expression = Parse_expression();
-            }else{
-                if(tmp_node->LEFT_S){
+                //expression
+            } else {
+                if (tmp_node->LEFT_S) {
                     //look back
+                    tmp_node = nullptr;
                     expression->Pull_back(tokens);
-                    }
+                    expression->simple_expression = Parse_simple_expression();
+                    //simple_expression
+                }
             }
         }
         return expression;
     }
 
     node_var *Parser::Parse_var() {
+        node_var *var = new node_var;
 
+        var->ID = consume_token();
+        //ID
+        if (match(signal_type::LEFT_S)) {
+            var->LEFT_S = consume_token();
+            //'['
+            var->expression = Parse_expression();
+            //expression
+            var->RIGHT_S = consume_token(signal_type::RIGHT_S);
+            //']'
+        }
+
+        return var;
     }
 
     node_simple_expression *Parser::Parse_simple_expression() {
+        node_simple_expression *simpleExpression = new node_simple_expression;
 
+        simpleExpression->additive_expression_1 = Parse_additive_expression();
+
+        switch (peek()) {
+            case token_type::signal_type: {
+                switch (peek_signal()) {
+                    case signal_type::LE:
+                    case signal_type::LT:
+                    case signal_type::GT:
+                    case signal_type::GE:
+                    case signal_type::EQ:
+                    case signal_type::NEQ: {
+                        simpleExpression->relop = Parse_relop();
+                        //relop
+                        simpleExpression->additive_expression_2 = Parse_additive_expression();
+                        //additive_expression
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        //(relop additive_expression)?
+
+        return simpleExpression;
     }
 
     node_relop *Parser::Parse_relop() {
+        node_relop *relop = new node_relop;
 
+        relop->RELOP = consume_token();
+        //sign
+        return relop;
     }
 
     node_additive_expression *Parser::Parse_additive_expression() {
+        node_additive_expression *additiveExpression = new node_additive_expression;
 
+        additiveExpression->term_1 = Parse_term();
+        //term
+
+        bool break_while = false;
+        while (!Is_end()) {
+            switch (peek()) {
+                case token_type::signal_type: {
+                    switch (peek_signal()) {
+                        case signal_type::ADD:
+                        case signal_type::SUB: {
+                            additiveExpression->addop->push_back(Parse_addop());
+                            //addop
+                            additiveExpression->term->push_back(Parse_term());
+                            //term
+                            break;
+                        }
+                        default: {
+                            break_while = true;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    break_while = true;
+                    break;
+                }
+            }
+            if (break_while) {
+                break;
+            }
+        }
+        //(addop term)*
+
+        return additiveExpression;
     }
 
-    node_addop *Parser::Parse_addop() {
 
+    node_addop *Parser::Parse_addop() {
+        node_addop *addop = new node_addop;
+
+        addop->op = consume_token();
+        //op
+
+        return addop;
     }
 
     node_term *Parser::Parse_term() {
+        node_term *term = new node_term;
 
+        term->factor_1 = Parse_factor();
+        //factor
+        bool break_while = false;
+        while (!Is_end()) {
+            switch (peek()) {
+                case token_type::signal_type: {
+                    switch (peek_signal()) {
+                        case signal_type::MUL:
+                        case signal_type::DIV: {
+                            term->mulop->push_back(Parse_mulop());
+                            //mulop
+                            term->factor->push_back(Parse_factor());
+                            //factor
+                            break;
+                        }
+                        default: {
+                            break_while = true;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    break_while = true;
+                    break;
+                }
+            }
+            if (break_while) {
+                break;
+            }
+        }
+        //(mulop factor)*
+
+        return term;
     }
 
     node_mulop *Parser::Parse_mulop() {
+        node_mulop *mulop = new node_mulop;
 
+        mulop->op = consume_token();
+        //op
+        return mulop;
     }
 
     node_factor *Parser::Parse_factor() {
+        node_factor *factor = new node_factor;
 
+        switch (peek()) {
+            case token_type::signal_type: {
+                switch (peek_signal()) {
+                    case signal_type::LEFT_P: {
+                        factor->LEFT_P = consume_token();
+                        factor->expression = Parse_expression();
+                        factor->RIGHT_P = consume_token(signal_type::RIGHT_P);
+                        break;
+                    }
+                    default: {
+                        consume_error();
+                        break;
+                    }
+                }
+                break;
+            }
+            case token_type::identifier_type: {
+                factor->ID = consume_token();
+                factor->factor_s = Parse_factor_s();
+                break;
+            }
+            case token_type::number_type: {
+                factor->NUM = consume_token();
+                break;
+            }
+            default: {
+                consume_error();
+                break;
+            }
+        }
+
+        return factor;
     }
 
     node_factor_s *Parser::Parse_factor_s() {
+        node_factor_s *factorS = new node_factor_s;
+        switch (peek()) {
+            case token_type::signal_type: {
+                switch (peek_signal()) {
+                    case signal_type::LEFT_S: {
+                        factorS->LEFT_S = consume_token();
+                        //'['
+                        factorS->expression = Parse_expression();
+                        //expression
+                        factorS->RIGHT_S = consume_token(signal_type::RIGHT_S);
+                        //']'
+                        break;
+                    }
+                    case signal_type::LEFT_P: {
+                        factorS->LEFT_P = consume_token();
+                        //'('
+                        factorS->args = Parse_args();
+                        //args
+                        factorS->RIGHT_P = consume_token(signal_type::RIGHT_P);
+                        //')'
+                    }
+                    default: {
+                        return nullptr;
+                    }
+                }
+                break;
+            }
+            default: {
+                return nullptr;
+            }
+        }
 
+        return factorS;
     }
 
     node_base *Parser::Parse_args() {
+        node_args *args = new node_args;
 
+        switch (peek()) {
+            case token_type::signal_type: {
+                switch (peek_signal()) {
+                    case signal_type::LEFT_P: {
+                        args->expression_1 = Parse_expression();
+                        break;
+                    }
+                    default: {
+                        return nullptr;
+                    }
+                }
+                break;
+            }
+            case token_type::identifier_type:
+            case token_type::number_type: {
+                args->expression_1 = Parse_expression();
+                break;
+            }
+            default: {
+                return nullptr;
+            }
+        }
+
+        while (!Is_end()) {
+            if (match(signal_type::COMMA)) {
+                args->COMMA->push_back(consume_token());
+                args->expression->push_back(Parse_expression());
+            } else {
+                break;
+            }
+        }
+
+        return args;
     }
 
     std::deque<std::string> *Parser::getMessages() const {
         return messages;
     }
-
 
 }
