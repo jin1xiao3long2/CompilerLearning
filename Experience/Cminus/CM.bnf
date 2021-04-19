@@ -46,8 +46,8 @@
                        | simple_expression
                        ;
   
- var ::= ID ( '[' expression ']' )? ;
-  
+ var ::= ID ('[' expression ']')?;
+
  simple_expression ::= additive_expression (relop additive_expression)? ;
   
  relop ::= '<=' | '<' | '>' | '>=' | '==' | '~=' ;

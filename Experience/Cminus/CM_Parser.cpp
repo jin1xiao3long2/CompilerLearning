@@ -576,15 +576,102 @@ namespace cm {
     node_iteration_stmt *Parser::Parse_iteration_stmt() {
         node_iteration_stmt *iterationStmt = new node_iteration_stmt;
 
+        iterationStmt->WHILE = consume_token();
+        //WHILE
+        iterationStmt->LEFT_P = consume_token(signal_type::LEFT_P);
+        //'('
+        iterationStmt->expression = Parse_expression();
+        //expression
+        iterationStmt->RIGHT_P = consume_token(signal_type::RIGHT_P);
+        //')'
+        iterationStmt->statement = Parse_statement();
+        //statement
         return iterationStmt;
     }
 
     node_return_stmt *Parser::Parse_return_stmt() {
+        node_return_stmt *returnStmt = new node_return_stmt;
 
+        returnStmt->RETURN = consume_token();
+        //RETURN
+        switch (peek()) {
+            case token_type::signal_type:{
+                switch (peek_signal()) {
+                    case signal_type::RIGHT_P:{
+                        returnStmt->expression = Parse_statement();
+                        break;
+                    }
+                    //statement
+                    default:{
+                        break;
+                    }
+                }
+                break;
+            }
+            case token_type::number_type:
+            case token_type::identifier_type:{
+                returnStmt->expression = Parse_expression();
+                break;
+            }
+            //expression
+            default:{
+                break;
+            }
+        }
+        //(expression)?
+
+        return returnStmt;
     }
 
     node_expression *Parser::Parse_expression() {
+        node_expression *expression = new node_expression;
+        //look back, we may have to use a stack
+        node_var *tmp_node = nullptr;
+        bool check_var = false;
+        //for look back, will be nullptr in the end
+        switch (peek()) {
+            case token_type::signal_type:{
+                switch (peek_signal()) {
+                    case signal_type::LEFT_P:{
+                        expression->simple_expression = Parse_simple_expression();
+                        break;
+                    }
+                    default:{//actually it is invalid code
+                        consume_error();
+                        break;
+                    }
+                }
+                break;
+            }
+            case token_type::number_type:{
+                expression->simple_expression = Parse_simple_expression();
+                break;
+            }
+            case token_type::identifier_type:{
+                 tmp_node = Parse_var();
+                 check_var = true;
+                 break;
+            }
+            default:{//actually it is invalid code
+                consume_error();
+                break;
+            }
+        }
 
+        if(check_var){
+            if(match(signal_type::EQ)){
+                expression->var = tmp_node;
+                tmp_node = nullptr;
+                expression->EQ = consume_token();
+                expression->expression = Parse_expression();
+            }else{
+                if(tmp_node->LEFT_S){
+                    //look back
+                    expression->Pull_back(tokens);
+                    }
+            }
+        }
+        return expression;
     }
 
     node_var *Parser::Parse_var() {

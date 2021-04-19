@@ -10,7 +10,7 @@ namespace cm {
 
     struct node_base {
         virtual void Eval(int, std::deque<std::string> *) = 0;
-
+        virtual void Pull_back(std::deque<token_base*>&) = 0;
         virtual ~node_base() = default;
     };
 
@@ -20,6 +20,8 @@ namespace cm {
         std::deque<node_base *> *declaration{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_program() override {
             delete declaration_1;
@@ -35,6 +37,8 @@ namespace cm {
 
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_declaration() override {
             delete type_specifier;
@@ -55,6 +59,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_declaration_s() override {
             delete SEMICOLON;
             delete LEFT_P;
@@ -72,6 +78,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_type_specifier() override {
             delete TYPE;
         }
@@ -82,6 +90,8 @@ namespace cm {
         node_base *int_param_list{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_params() override {
             delete void_param_list;
@@ -98,6 +108,8 @@ namespace cm {
         std::deque<node_base *> *param{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_void_param_list() override {
             delete VOID;
@@ -121,6 +133,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_int_param_list() override {
             delete INT;
             delete ID;
@@ -141,6 +155,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_param() override {
             delete type_specifier;
             delete ID;
@@ -156,6 +172,8 @@ namespace cm {
         token_base *RIGHT_B{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_compound_stmt() override {
             delete LEFT_B;
@@ -176,6 +194,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_var_declaration(){
             delete type_specifier;
             delete ID;
@@ -194,6 +214,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_statement() override {
             delete express_stmt;
             delete compound_stmt;
@@ -208,6 +230,8 @@ namespace cm {
         token_base *SEMICOLON{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_expression_stmt() override {
             delete expression;
@@ -225,6 +249,8 @@ namespace cm {
         node_base *statement_2{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_selection_stmt() override {
             delete IF;
@@ -246,6 +272,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_iteration_stmt() override {
             delete WHILE;
             delete LEFT_P;
@@ -261,6 +289,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_return_stmt() override {
             delete RETURN;
             delete expression;
@@ -274,6 +304,8 @@ namespace cm {
         node_base *simple_expression{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_expression() override {
             delete var;
@@ -291,6 +323,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_var() override {
             delete ID;
             delete LEFT_S;
@@ -306,6 +340,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_simple_expression() override {
             delete additive_expression_1;
             delete relop;
@@ -318,6 +354,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_relop() override {
             delete RELOP;
         }
@@ -329,6 +367,8 @@ namespace cm {
         std::deque<node_base *> *term{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_additive_expression() override{
             delete term_1;
@@ -344,6 +384,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_addop(){
             delete op;
         }
@@ -355,6 +397,8 @@ namespace cm {
         std::deque<node_base *> *factor{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_term() override{
             delete factor_1;
@@ -370,6 +414,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_mulop(){
             delete op;
         }
@@ -384,6 +430,8 @@ namespace cm {
         token_base *NUM{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_factor() override{
             delete LEFT_P;
@@ -406,6 +454,8 @@ namespace cm {
 
         void Eval(int, std::deque<std::string> *) override;
 
+        void Pull_back(std::deque<token_base *> &) override;
+
         ~node_factor_s() override{
             delete LEFT_S;
             delete expression;
@@ -424,6 +474,8 @@ namespace cm {
         node_base *empty{};
 
         void Eval(int, std::deque<std::string> *) override;
+
+        void Pull_back(std::deque<token_base *> &) override;
 
         ~node_args() override{
             delete expression_1;
