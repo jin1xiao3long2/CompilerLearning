@@ -148,6 +148,8 @@ namespace cm {
                         //'NUM'
                         declarationS->RIGHT_S = consume_token(signal_type::RIGHT_S);
                         //']'
+                        declarationS->SEMICOLON = consume_token(signal_type::SEMICOLON);
+                        //';'
                         break;
                     }
                     case signal_type::LEFT_P: {
@@ -413,6 +415,7 @@ namespace cm {
                         //NUM
                         varDeclaration->RIGHT_S = consume_token(signal_type::RIGHT_S);
                         //']'
+
                         break;
                     }
                     default: {

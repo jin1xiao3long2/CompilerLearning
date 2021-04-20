@@ -13,7 +13,8 @@ namespace cm {
             mes.append("  ");
         mes.append(info);
         std::cerr << mes << std::endl;
-        messages->push_back(mes);
+        if(messages)
+            messages->push_back(mes);
     }
 
     void support_recur_term(node_base* node, std::deque<node_base *> *ops, std::deque<node_base*> *nodes , int i, std::deque<std::string>* message){
@@ -142,6 +143,8 @@ namespace cm {
         //INT
         add_tree_info(j, "Idk: " + ID->get_string(), messages);
         //ID
+        if(LEFT_S)
+            add_tree_info(j, "Idk:", messages);
 
         for (auto param_iter = param->begin(); param_iter != param->end(); param_iter++) {
             (*param_iter)->Eval(i, messages);
@@ -186,9 +189,14 @@ namespace cm {
         add_tree_info(i, "Var_DeclK", messages);
         type_specifier->Eval(j, messages);
         //ID
-        add_tree_info(j, "IdK: " + ID->get_string(), messages);
+
         if (NUMBER) {
             //num
+            add_tree_info(j, "Array_DeclK", messages);
+            add_tree_info(j + 1, "IdK: " + ID->get_string(), messages);
+            add_tree_info(j + 1, "ConstK: " + NUMBER->get_string(), messages);
+        }else{
+            add_tree_info(j, "IdK: " + ID->get_string(), messages);
         }
     }
 
@@ -295,6 +303,7 @@ namespace cm {
     }
 
     void node_var::Pull_back(std::deque<token_base *> &tokens) {
+        this->Eval(10, nullptr);
         if (LEFT_S) {
             tokens.push_front(this->RIGHT_S);
             this->expression->Pull_back(tokens);
@@ -408,8 +417,9 @@ namespace cm {
                     add_tree_info(j, "IdK: " + ID->get_string(), messages);
                     factor_s->Eval(j, messages);
                 }else if(reinterpret_cast<node_factor_s*>(factor_s)->expression){
-                    add_tree_info(i, "array", messages);
+                    add_tree_info(i, "Arry_ElemK", messages);
                     add_tree_info(j, "IdK: " + ID->get_string(), messages);
+                    factor_s->Eval(j, messages);
                 }
 
             }else{
@@ -426,7 +436,8 @@ namespace cm {
             expression->Pull_back(tokens);
             tokens.push_front(this->LEFT_P);
         } else if (this->ID) {
-            this->factor_s->Pull_back(tokens);
+            if(factor_s)
+                this->factor_s->Pull_back(tokens);
             tokens.push_front(this->ID);
         } else {
             tokens.push_front(this->NUM);
