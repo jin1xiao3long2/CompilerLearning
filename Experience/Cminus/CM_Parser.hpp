@@ -89,6 +89,7 @@ namespace cm {
 
         std::deque<token_base *> tokens;
         std::deque<std::string> *messages = new std::deque<std::string>;
+        int lineNum = 0;
         node_base *start = nullptr;
 
         const std::string get_token_info() const;
@@ -181,7 +182,7 @@ namespace cm {
         }
 
         void parse(){
-            messages->push_back("CMINUS Parsing");
+            messages->push_back("CMINUS Parsing\n");
             start = Parse_program();
             messages->push_back("Syntax tree");
             start->Eval(1, messages);

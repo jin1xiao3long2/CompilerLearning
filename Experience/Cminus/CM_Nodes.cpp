@@ -12,7 +12,7 @@ namespace cm {
         for (int i = 0; i < l; i++)
             mes.append("  ");
         mes.append(info);
-        std::cerr << mes << std::endl;
+//        std::cerr << mes << std::endl;
         if(messages)
             messages->push_back(mes);
     }
@@ -303,7 +303,6 @@ namespace cm {
     }
 
     void node_var::Pull_back(std::deque<token_base *> &tokens) {
-        this->Eval(10, nullptr);
         if (LEFT_S) {
             tokens.push_front(this->RIGHT_S);
             this->expression->Pull_back(tokens);

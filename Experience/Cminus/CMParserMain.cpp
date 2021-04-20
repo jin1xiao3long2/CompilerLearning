@@ -46,8 +46,12 @@ void get_write_filename(const std::string &filename, std::string &write_filename
 void write_syntax_tree(const std::deque<std::string> *messages, const std::string &write_filename) {
     std::fstream fs;
     fs.open(write_filename, std::ios::out);
-    for(auto iter = messages->begin(); iter != messages->end(); iter++){
-        fs << iter->data() << '\n';
+    if(fs.is_open()) {
+        for (auto iter = messages->begin(); iter != messages->end(); iter++) {
+            fs << iter->data() << '\n';
+        }
+    }else{
+        std::cerr << "can't open file" << std::endl;
     }
 }
 
@@ -74,6 +78,7 @@ int main(int argc, char **argv) {
     lexer->Lex();
     std::deque<cm::token_base *> tokens = lexer->getTokens();
 
+//    test tokens
 //    for(auto iter = tokens.begin(); iter != tokens.end(); iter++){
 //        std::cout << "line : " << (*iter)->get_line()  << "  column : " << (*iter)->get_column() << " info :  " << (*iter)->get_show_info() << std::endl;
 //    }
@@ -86,13 +91,14 @@ int main(int argc, char **argv) {
     //get string
     std::deque<std::string>* mes = parser->getMessages();
 
+//    test syntax tree
 //    for(auto iter = mes->begin(); iter != mes->end(); iter++){
 //        std::cout << iter->data() << std::endl;
 //    }
     //write into files
-//    std::string writeFilename;
-//    get_write_filename(filename, writeFilename);
-//    write_syntax_tree(mes, writeFilename);
+    std::string writeFilename;
+    get_write_filename(filename, writeFilename);
+    write_syntax_tree(mes, writeFilename);
 //    std::cout << "filename is " << writeFilename << std::endl;
     return 0;
 }
