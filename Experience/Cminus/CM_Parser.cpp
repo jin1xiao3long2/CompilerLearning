@@ -4,6 +4,10 @@
 
 #include <CM_Parser.hpp>
 
+void show_info(const std::string &src){
+    std::cerr << src << std::endl;
+}
+
 namespace cm {
 
     const std::string Parser::get_token_info() const {
@@ -50,6 +54,7 @@ namespace cm {
     token_base *Parser::consume_token() {
         Ensure();
         token_base *value = tokens.front();
+        std::cerr << "line : " << value->get_line()  << "  column : " << value->get_column() << " info :  " << value->get_show_info() << std::endl;
         tokens.pop_front();
         return value;
     }
@@ -101,7 +106,7 @@ namespace cm {
 
     node_program *Parser::Parse_program() {
         node_program *program = new node_program;
-
+        ::show_info("parse_program");
         program->declaration_1 = Parse_declaration();
         //declaration
         while (!Is_end()) {
@@ -114,7 +119,7 @@ namespace cm {
 
     node_declaration *Parser::Parse_declaration() {
         node_declaration *declaration = new node_declaration;
-
+        ::show_info("parse_declaration");
         declaration->type_specifier = Parse_type_speicifier();
         //type_specifier
         declaration->id = consume_token(token_type::identifier_type);
@@ -127,7 +132,7 @@ namespace cm {
 
     node_declaration_s *Parser::Parse_declaration_s() {
         node_declaration_s *declarationS = new node_declaration_s;
-
+        ::show_info("parse_declaration_s");
         switch (peek()) {
             case token_type::signal_type: {
                 switch (peek_signal()) {
@@ -173,9 +178,9 @@ namespace cm {
 
     node_type_specifier *Parser::Parse_type_speicifier() {
         node_type_specifier *typeSpecifier = nullptr;
-
+        ::show_info("parse_type_specifier");
         switch (peek()) {
-            case token_type::signal_type: {
+            case token_type::keyword_type: {
                 switch (peek_keyword()) {
                     case keyword_type::INT:
                     case keyword_type::VOID: {
@@ -201,7 +206,7 @@ namespace cm {
 
     node_params *Parser::Parse_params() {
         node_params *params = new node_params;
-
+        ::show_info("parse_params");
         switch (peek()) {
             case token_type::keyword_type: {
                 switch (peek_keyword()) {
@@ -233,7 +238,7 @@ namespace cm {
 
     node_void_param_list *Parser::Parse_void_param_list() {
         node_void_param_list *voidParamList = new node_void_param_list;
-
+        ::show_info("parse_voidParamList");
         voidParamList->VOID = consume_token();
 
         switch (peek()) {
@@ -287,7 +292,7 @@ namespace cm {
 
     node_int_param_list *Parser::Parse_int_param_list() {
         node_int_param_list *intParamList = new node_int_param_list;
-
+        ::show_info("parse_int_param_list");
         intParamList->INT = consume_token(keyword_type::INT);
         //INT
         intParamList->ID = consume_token(token_type::identifier_type);
@@ -306,6 +311,9 @@ namespace cm {
                         break;
                     }
                 }
+                break;
+            }
+            default:{
                 break;
             }
         }
@@ -328,7 +336,7 @@ namespace cm {
 
     node_param *Parser::Parse_param() {
         node_param *param = new node_param;
-
+        ::show_info("parse_param");
         param->type_specifier = Parse_type_speicifier();
         //type_specifier
         param->ID = consume_token(token_type::identifier_type);
@@ -360,7 +368,7 @@ namespace cm {
 
     node_compound_stmt *Parser::Parse_compound_stmt() {
         node_compound_stmt *compoundStmt = new node_compound_stmt;
-
+        ::show_info("parse_compound_stmt");
         compoundStmt->LEFT_B = consume_token(signal_type::LEFT_B);
         //'{'
         while (!Is_end()) {
@@ -390,7 +398,7 @@ namespace cm {
 
     node_var_declaration *Parser::Parse_var_declaration() {
         node_var_declaration *varDeclaration = new node_var_declaration;
-
+        ::show_info("parse_var_declaration");
         varDeclaration->type_specifier = Parse_type_speicifier();
         //type_specifier
         varDeclaration->ID = consume_token(token_type::identifier_type);
@@ -418,13 +426,14 @@ namespace cm {
             }
         }
         //('[' NUM ']')?
+        varDeclaration->SEMICOLON = consume_token(signal_type::SEMICOLON);
 
         return varDeclaration;
     }
 
     node_statement *Parser::Parse_statement() {
         node_statement *statement = new node_statement;
-
+        ::show_info("parse_statement");
         switch (peek()) {
             case token_type::signal_type: {
                 switch (peek_signal()) {
@@ -490,7 +499,7 @@ namespace cm {
 
     node_expression_stmt *Parser::Parse_expression_stmt() {
         node_expression_stmt *expressionStmt = new node_expression_stmt;
-
+        ::show_info("parse_expression_stmt");
         bool need_semi = true;
 
         switch (peek()) {
@@ -537,7 +546,7 @@ namespace cm {
 
     node_selection_stmt *Parser::Parse_selection_stmt() {
         node_selection_stmt *selectionStmt = new node_selection_stmt;
-
+        ::show_info("parse_selection_stmt");
         selectionStmt->IF = consume_token();
         //IF
         selectionStmt->LEFT_P = consume_token(signal_type::LEFT_P);
@@ -548,6 +557,7 @@ namespace cm {
         //')'
         selectionStmt->statement_1 = Parse_statement();
         //statement
+
         switch (peek()) {
             case token_type::keyword_type: {
                 switch (peek_keyword()) {
@@ -575,7 +585,7 @@ namespace cm {
 
     node_iteration_stmt *Parser::Parse_iteration_stmt() {
         node_iteration_stmt *iterationStmt = new node_iteration_stmt;
-
+        ::show_info("parse_iteration_stmt");
         iterationStmt->WHILE = consume_token();
         //WHILE
         iterationStmt->LEFT_P = consume_token(signal_type::LEFT_P);
@@ -598,10 +608,10 @@ namespace cm {
             case token_type::signal_type: {
                 switch (peek_signal()) {
                     case signal_type::RIGHT_P: {
-                        returnStmt->expression = Parse_statement();
+                        returnStmt->expression = Parse_expression();
                         break;
                     }
-                        //statement
+                        //expression
                     default: {
                         break;
                     }
@@ -619,14 +629,17 @@ namespace cm {
             }
         }
         //(expression)?
+        returnStmt->SEMICOLON = consume_token(signal_type::SEMICOLON);
+        //';'
 
         return returnStmt;
     }
 
     node_expression *Parser::Parse_expression() {
         node_expression *expression = new node_expression;
-        //look back, we may have to use a stack
-        node_var *tmp_node = nullptr;
+        ::show_info("parse_expression");
+        //pull back
+        node_base *tmp_node = nullptr;
         bool check_var = false;
         //for look back, will be nullptr in the end
         switch (peek()) {
@@ -661,8 +674,9 @@ namespace cm {
         }
 
         if (check_var) {
-            if (match(signal_type::EQ)) {
+            if (match(signal_type::ASSIGN)) {
                 expression->var = tmp_node;
+
                 //var
                 tmp_node = nullptr;
                 expression->EQ = consume_token();
@@ -670,13 +684,11 @@ namespace cm {
                 expression->expression = Parse_expression();
                 //expression
             } else {
-                if (tmp_node->LEFT_S) {
-                    //look back
+                    //pull back
+                    tmp_node->Pull_back(tokens);
                     tmp_node = nullptr;
-                    expression->Pull_back(tokens);
                     expression->simple_expression = Parse_simple_expression();
                     //simple_expression
-                }
             }
         }
         return expression;
@@ -684,7 +696,7 @@ namespace cm {
 
     node_var *Parser::Parse_var() {
         node_var *var = new node_var;
-
+        ::show_info("parse_var");
         var->ID = consume_token();
         //ID
         if (match(signal_type::LEFT_S)) {
@@ -701,7 +713,7 @@ namespace cm {
 
     node_simple_expression *Parser::Parse_simple_expression() {
         node_simple_expression *simpleExpression = new node_simple_expression;
-
+        ::show_info("parse_simple_parser");
         simpleExpression->additive_expression_1 = Parse_additive_expression();
 
         switch (peek()) {
@@ -736,7 +748,7 @@ namespace cm {
 
     node_relop *Parser::Parse_relop() {
         node_relop *relop = new node_relop;
-
+        ::show_info("parse_relop");
         relop->RELOP = consume_token();
         //sign
         return relop;
@@ -744,7 +756,7 @@ namespace cm {
 
     node_additive_expression *Parser::Parse_additive_expression() {
         node_additive_expression *additiveExpression = new node_additive_expression;
-
+        ::show_info("parse_additive_expression");
         additiveExpression->term_1 = Parse_term();
         //term
 
@@ -785,7 +797,7 @@ namespace cm {
 
     node_addop *Parser::Parse_addop() {
         node_addop *addop = new node_addop;
-
+        ::show_info("parse_addop");
         addop->op = consume_token();
         //op
 
@@ -794,9 +806,10 @@ namespace cm {
 
     node_term *Parser::Parse_term() {
         node_term *term = new node_term;
-
+        ::show_info("parse_term");
         term->factor_1 = Parse_factor();
         //factor
+
         bool break_while = false;
         while (!Is_end()) {
             switch (peek()) {
@@ -804,6 +817,7 @@ namespace cm {
                     switch (peek_signal()) {
                         case signal_type::MUL:
                         case signal_type::DIV: {
+
                             term->mulop->push_back(Parse_mulop());
                             //mulop
                             term->factor->push_back(Parse_factor());
@@ -833,7 +847,7 @@ namespace cm {
 
     node_mulop *Parser::Parse_mulop() {
         node_mulop *mulop = new node_mulop;
-
+        ::show_info("parse_mulop");
         mulop->op = consume_token();
         //op
         return mulop;
@@ -841,7 +855,7 @@ namespace cm {
 
     node_factor *Parser::Parse_factor() {
         node_factor *factor = new node_factor;
-
+        ::show_info("parse_factor");
         switch (peek()) {
             case token_type::signal_type: {
                 switch (peek_signal()) {
@@ -878,6 +892,7 @@ namespace cm {
 
     node_factor_s *Parser::Parse_factor_s() {
         node_factor_s *factorS = new node_factor_s;
+        ::show_info("parse_factor_s");
         switch (peek()) {
             case token_type::signal_type: {
                 switch (peek_signal()) {
@@ -914,7 +929,7 @@ namespace cm {
 
     node_base *Parser::Parse_args() {
         node_args *args = new node_args;
-
+        ::show_info("parse_args");
         switch (peek()) {
             case token_type::signal_type: {
                 switch (peek_signal()) {

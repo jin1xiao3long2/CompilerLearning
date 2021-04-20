@@ -10,14 +10,16 @@ namespace cm {
 
     struct node_base {
         virtual void Eval(int, std::deque<std::string> *) = 0;
-        virtual void Pull_back(std::deque<token_base*>&) = 0;
+
+        virtual void Pull_back(std::deque<token_base *> &) = 0;
+
         virtual ~node_base() = default;
     };
 
     struct node_program final : node_base {
 
         node_base *declaration_1{};
-        std::deque<node_base *> *declaration{};
+        std::deque<node_base *> *declaration = new std::deque<node_base *>;
 
         void Eval(int, std::deque<std::string> *) override;
 
@@ -104,8 +106,8 @@ namespace cm {
         token_base *ID{};
         token_base *LEFT_S{};
         token_base *RIGHT_S{};
-        std::deque<token_base*> *COMMA{};
-        std::deque<node_base *> *param{};
+        std::deque<token_base *> *COMMA = new std::deque<token_base *>;
+        std::deque<node_base *> *param = new std::deque<node_base *>;
 
         void Eval(int, std::deque<std::string> *) override;
 
@@ -128,8 +130,8 @@ namespace cm {
         token_base *ID{};
         token_base *LEFT_S{};
         token_base *RIGHT_S{};
-        std::deque<token_base *> *COMMA{};
-        std::deque<node_base *> *param{};
+        std::deque<token_base *> *COMMA = new std::deque<token_base *>;
+        std::deque<node_base *> *param = new std::deque<node_base *>;
 
         void Eval(int, std::deque<std::string> *) override;
 
@@ -167,8 +169,8 @@ namespace cm {
 
     struct node_compound_stmt final : node_base {
         token_base *LEFT_B{};
-        std::deque<node_base *> *var_declaration{};
-        std::deque<node_base *> *statement{};
+        std::deque<node_base *> *var_declaration = new std::deque<node_base *>;
+        std::deque<node_base *> *statement = new std::deque<node_base *>;
         token_base *RIGHT_B{};
 
         void Eval(int, std::deque<std::string> *) override;
@@ -185,23 +187,25 @@ namespace cm {
         }
     };
 
-    struct node_var_declaration final : node_base{
-        node_type_specifier* type_specifier{};
-        token_base* ID{};
-        token_base* LEFT_S{};
-        token_base* NUMBER{};
-        token_base* RIGHT_S{};
+    struct node_var_declaration final : node_base {
+        node_type_specifier *type_specifier{};
+        token_base *ID{};
+        token_base *LEFT_S{};
+        token_base *NUMBER{};
+        token_base *RIGHT_S{};
+        token_base *SEMICOLON{};
 
         void Eval(int, std::deque<std::string> *) override;
 
         void Pull_back(std::deque<token_base *> &) override;
 
-        ~node_var_declaration(){
+        ~node_var_declaration() {
             delete type_specifier;
             delete ID;
             delete LEFT_S;
             delete NUMBER;
             delete RIGHT_S;
+            delete SEMICOLON;
         }
     };
 
@@ -286,6 +290,7 @@ namespace cm {
     struct node_return_stmt final : node_base {
         token_base *RETURN{};
         node_base *expression{};
+        token_base *SEMICOLON{};
 
         void Eval(int, std::deque<std::string> *) override;
 
@@ -294,6 +299,7 @@ namespace cm {
         ~node_return_stmt() override {
             delete RETURN;
             delete expression;
+            delete SEMICOLON;
         }
     };
 
@@ -361,16 +367,16 @@ namespace cm {
         }
     };
 
-    struct node_additive_expression final : node_base{
+    struct node_additive_expression final : node_base {
         node_base *term_1{};
-        std::deque<node_base *> *addop{};
-        std::deque<node_base *> *term{};
+        std::deque<node_base *> *addop = new std::deque<node_base *>;
+        std::deque<node_base *> *term = new std::deque<node_base *>;
 
         void Eval(int, std::deque<std::string> *) override;
 
         void Pull_back(std::deque<token_base *> &) override;
 
-        ~node_additive_expression() override{
+        ~node_additive_expression() override {
             delete term_1;
             addop->clear();
             delete addop;
@@ -379,28 +385,28 @@ namespace cm {
         }
     };
 
-    struct node_addop final : node_base{
+    struct node_addop final : node_base {
         token_base *op{};
 
         void Eval(int, std::deque<std::string> *) override;
 
         void Pull_back(std::deque<token_base *> &) override;
 
-        ~node_addop(){
+        ~node_addop() {
             delete op;
         }
     };
 
-    struct node_term final : node_base{
+    struct node_term final : node_base {
         node_base *factor_1{};
-        std::deque<node_base *> *mulop{};
-        std::deque<node_base *> *factor{};
+        std::deque<node_base *> *mulop = new std::deque<node_base *>;
+        std::deque<node_base *> *factor = new std::deque<node_base *>;
 
         void Eval(int, std::deque<std::string> *) override;
 
         void Pull_back(std::deque<token_base *> &) override;
 
-        ~node_term() override{
+        ~node_term() override {
             delete factor_1;
             mulop->clear();
             delete mulop;
@@ -409,19 +415,19 @@ namespace cm {
         }
     };
 
-    struct node_mulop final: node_base{
+    struct node_mulop final : node_base {
         token_base *op{};
 
         void Eval(int, std::deque<std::string> *) override;
 
         void Pull_back(std::deque<token_base *> &) override;
 
-        ~node_mulop(){
+        ~node_mulop() {
             delete op;
         }
     };
 
-    struct node_factor final : node_base{
+    struct node_factor final : node_base {
         token_base *LEFT_P{};
         node_base *expression{};
         token_base *RIGHT_P{};
@@ -433,7 +439,7 @@ namespace cm {
 
         void Pull_back(std::deque<token_base *> &) override;
 
-        ~node_factor() override{
+        ~node_factor() override {
             delete LEFT_P;
             delete expression;
             delete RIGHT_P;
@@ -443,7 +449,7 @@ namespace cm {
         }
     };
 
-    struct node_factor_s final : node_base{
+    struct node_factor_s final : node_base {
         token_base *LEFT_S{};
         node_base *expression{};
         token_base *RIGHT_S{};
@@ -456,7 +462,7 @@ namespace cm {
 
         void Pull_back(std::deque<token_base *> &) override;
 
-        ~node_factor_s() override{
+        ~node_factor_s() override {
             delete LEFT_S;
             delete expression;
             delete RIGHT_S;
@@ -467,17 +473,17 @@ namespace cm {
         }
     };
 
-    struct node_args final : node_base{
+    struct node_args final : node_base {
         node_base *expression_1{};
-        std::deque<token_base *> *COMMA{};
-        std::deque<node_base *> *expression{};
+        std::deque<token_base *> *COMMA = new std::deque<token_base *>;
+        std::deque<node_base *> *expression = new std::deque<node_base *>;
         node_base *empty{};
 
         void Eval(int, std::deque<std::string> *) override;
 
         void Pull_back(std::deque<token_base *> &) override;
 
-        ~node_args() override{
+        ~node_args() override {
             delete expression_1;
             COMMA->clear();
             delete COMMA;
@@ -486,7 +492,6 @@ namespace cm {
             delete empty;
         }
     };
-
 
 
 }

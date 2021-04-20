@@ -15,7 +15,10 @@ void show(int (*func)(int, int), int a, int b){
 
 
 int main(){
-    show(add, 1 ,2);
-    show(mul ,1 ,2);
+    int *a = new int (3);
+    int *b = a;
+    std::cout << "a is :  " << *a << "   b is : " << *b << std::endl;
+    a = nullptr;
+    std::cout  << "   b is : " << *b << std::endl;
     return 0;
 }

@@ -23,7 +23,7 @@
   
  compound_stmt ::= '{' (var_declaration)* (statement)* '}' ;
 
-  var_declaration ::= type_specifier ID ('[' NUM ']')? ;
+  var_declaration ::= type_specifier ID ('[' NUM ']')? ';';
 
  statement ::= expression_stmt
                      | compound_stmt
@@ -40,7 +40,7 @@
   
   iteration_stmt ::= WHILE '(' expression ')' statement ;
   
-  return_stmt ::= RETURN (expression)?
+  return_stmt ::= RETURN (expression)? ';';  //semi may be wrong
   
   expression ::= var '=' expression
                        | simple_expression

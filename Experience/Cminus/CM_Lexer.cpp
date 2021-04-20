@@ -98,11 +98,11 @@ namespace cm {
                     column++;
                     continue;
                 } else if (is_newline(*p)) {
-                    pre_comment = false;
                     add_token_signal(line, column, "/");
                     pre_comment = false;
                     ++p;
-                    column++;
+                    line++;
+                    column = 1;
                     continue;
                 } else if (is_comment_start(*p)) {
                     ++p;
@@ -114,6 +114,10 @@ namespace cm {
                     pre_comment = false;
                     state = token_type::signal_type;
                     continue;
+                } else{
+                    pre_comment = false;
+                    add_token_signal(line, column, "/");
+                    state = token_type::null_type;
                 }
             }
             if (in_not_equal) {
@@ -232,15 +236,19 @@ namespace cm {
                         continue;
                     }
                     std::string sig = "";
+                    int offset = 0;
                     for(auto ch : tmp_value){
                         if(!is_signal(sig + ch)){
                             add_token_signal(line, tmp_column, sig);
                             sig = ch;
+                            tmp_column = tmp_column + offset;
+                            offset = 1;
                         }else{
                             sig += ch;
+                            offset++;
                         }
-                        tmp_column++;
                     }
+
                     if(!sig.empty()){
                         add_token_signal(line, tmp_column, sig);
                     }

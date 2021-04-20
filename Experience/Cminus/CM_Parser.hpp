@@ -178,10 +178,9 @@ namespace cm {
         Parser(const std::deque<token_base *> &Tokens) : tokens(std::move(Tokens)) {}
 
         ~Parser(){
-            delete start;
         }
 
-        void Parse(){
+        void parse(){
             start = Parse_program();
             start->Eval(0, messages);
         }
