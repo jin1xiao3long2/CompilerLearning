@@ -12,117 +12,163 @@ namespace cm {
         for (int i = 0; i < l; i++)
             mes.append("  ");
         mes.append(info);
+        std::cerr << mes << std::endl;
         messages->push_back(mes);
     }
 
-    void node_program::Eval(int i, std::deque<std::string> *messages) {
+    void support_recur_term(node_base* node, std::deque<node_base *> *ops, std::deque<node_base*> *nodes , int i, std::deque<std::string>* message){
         int j = i + 1;
+        if(ops->empty()){
+            node->Eval(i, message);
+            return ;
+        }
+        node_base* op_back = ops->back();
+        node_base* node_back = nodes->back();
+        ops->pop_back();
+        nodes->pop_back();
+        op_back->Eval(i, message);
 
-        declaration_1->Eval(j, messages);
+        support_recur_term(node, ops, nodes, j, message);
+        node_back->Eval(j, message);
+        nodes->push_back(node_back);
+        ops->push_back(op_back);
+        return ;
+    }
 
-        for(auto dec_iter = declaration->begin(); dec_iter != declaration->end(); dec_iter++){
-            (*dec_iter)->Eval(j, messages);
+    void node_program::Eval(int i, std::deque<std::string> *messages) {
+
+        declaration_1->Eval(i, messages);
+
+        for (auto dec_iter = declaration->begin(); dec_iter != declaration->end(); dec_iter++) {
+            (*dec_iter)->Eval(i, messages);
         }
     }
 
     void node_program::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_declaration::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
 
-        type_specifier->Eval(j, messages);
-        //ID
-        declaration_s->Eval(j, messages);
+        if (reinterpret_cast<node_declaration_s *>(declaration_s)->params) {
+            add_tree_info(i, "FuncK", messages);
+            type_specifier->Eval(j, messages);
+            add_tree_info(j, std::string("IdK: " + id->get_string()), messages);
+            declaration_s->Eval(j, messages);
+        } else if (reinterpret_cast<node_declaration_s *>(declaration_s)->NUMBER) {
+            add_tree_info(i, "ConstK", messages);
+            type_specifier->Eval(j, messages);
+            add_tree_info(j, std::string("IdK: " + id->get_string()), messages);
+            declaration_s->Eval(j, messages);
+        } else {
+            type_specifier->Eval(j, messages);
+            add_tree_info(j, std::string("IdK: " + id->get_string()), messages);
+            declaration_s->Eval(j, messages);
+        }
+
+
     }
 
     void node_declaration::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_declaration_s::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
 
-        if(SEMICOLON){
-            //semi
-        }else if(NUMBER){
-            //num
-        }else{
-            params->Eval(j, messages);
-            compound_stmt->Eval(j, messages);
+        if (SEMICOLON) {
+
+        } else if (NUMBER) {
+            add_tree_info(i, NUMBER->get_string(), messages);
+        } else {
+            add_tree_info(i, "ParamsK", messages);
+            params->Eval(i, messages);
+            compound_stmt->Eval(i, messages);
         }
     }
 
     void node_declaration_s::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_type_specifier::Eval(int i, std::deque<std::string> *messages) {
-        //type
+        std::string str = "";
+        if (this->TYPE->get_string() == "int") {
+            str = "IntK";
+        } else {
+            str = "VoidK";
+        }
+        add_tree_info(i, str, messages);
     }
 
     void node_type_specifier::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_params::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
-
-        if(void_param_list){
-            void_param_list->Eval(j , messages);
-        }else{
+        if (void_param_list) {
+            void_param_list->Eval(j, messages);
+        } else {
             int_param_list->Eval(j, messages);
         }
     }
 
     void node_params::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_void_param_list::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
         //void
-
-        for (auto param_iter = param->begin(); param_iter != param->end(); param_iter++){
-            (*param_iter)->Eval(j, messages);
+        add_tree_info(j, "VoidK", messages);
+        if (ID){
+            add_tree_info(j, "Idk" + ID->get_string(), messages);
+        }
+        for (auto param_iter = param->begin(); param_iter != param->end(); param_iter++) {
+           (*param_iter)->Eval(j, messages);
         }
     }
 
     void node_void_param_list::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_int_param_list::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
-
+        add_tree_info(i, "ParamK", messages);
+        add_tree_info(j, "IntK", messages);
         //INT
+        add_tree_info(j, "Idk: " + ID->get_string(), messages);
         //ID
 
-        for (auto param_iter = param->begin(); param_iter != param->end(); param_iter++){
-            (*param_iter)->Eval(j, messages);
+        for (auto param_iter = param->begin(); param_iter != param->end(); param_iter++) {
+            (*param_iter)->Eval(i, messages);
         }
     }
 
     void node_int_param_list::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_param::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
 
-        type_specifier->Eval(j, messages);
+        add_tree_info(i, "ParamK", messages);
 
+        type_specifier->Eval(j, messages);
         //ID
+        add_tree_info(j, "IdK: " + ID->get_string(), messages);
     }
 
     void node_param::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_compound_stmt::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
-
+        add_tree_info(i, "CompK", messages);
         for (auto var_iter = var_declaration->begin(); var_iter != var_declaration->end(); var_iter++) {
             (*var_iter)->Eval(j, messages);
         }
@@ -132,58 +178,58 @@ namespace cm {
     }
 
     void node_compound_stmt::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_var_declaration::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
-
+        add_tree_info(i, "Var_DeclK", messages);
         type_specifier->Eval(j, messages);
         //ID
+        add_tree_info(j, "IdK: " + ID->get_string(), messages);
         if (NUMBER) {
             //num
         }
     }
 
     void node_var_declaration::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_statement::Eval(int i, std::deque<std::string> *messages) {
-        int j = i + 1;
         if (express_stmt) {
-            express_stmt->Eval(j, messages);
+            express_stmt->Eval(i, messages);
         } else if (compound_stmt) {
-            compound_stmt->Eval(j, messages);
+            compound_stmt->Eval(i, messages);
         } else if (selection_stmt) {
-            selection_stmt->Eval(j, messages);
+            selection_stmt->Eval(i, messages);
         } else if (iteration_stmt) {
-            iteration_stmt->Eval(j, messages);
+            iteration_stmt->Eval(i, messages);
         } else if (return_stmt) {
-            return_stmt->Eval(j, messages);
+            return_stmt->Eval(i, messages);
         }
     }
 
     void node_statement::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_expression_stmt::Eval(int i, std::deque<std::string> *messages) {
-        int j = i + 1;
-
         if (expression) {
-            expression->Eval(j, messages);
+            expression->Eval(i, messages);
         }
     }
 
     void node_expression_stmt::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_selection_stmt::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
         //if
+        add_tree_info(i, "If", messages);
         expression->Eval(j, messages);
+
         statement_1->Eval(j, messages);
         if (ELSE) {
             statement_2->Eval(j, messages);
@@ -191,39 +237,42 @@ namespace cm {
     }
 
     void node_selection_stmt::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_iteration_stmt::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
         //while
+        add_tree_info(i, "While", messages);
         expression->Eval(j, messages);
         statement->Eval(j, messages);
     }
 
     void node_iteration_stmt::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_return_stmt::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
         //return
+        add_tree_info(i, "Return", messages);
         if (expression) {
             expression->Eval(j, messages);
         }
     }
 
     void node_return_stmt::Pull_back(std::deque<token_base *> &tokens) {
-
+//
     }
 
     void node_expression::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
         if (var) {
+            add_tree_info(i, "Assign", messages);
             var->Eval(j, messages);
             expression->Eval(j, messages);
         } else {
-            simple_expression->Eval(j, messages);
+            simple_expression->Eval(i, messages);
         }
     }
 
@@ -240,7 +289,9 @@ namespace cm {
     void node_var::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
         //ID
-        this->expression->Eval(j, messages);
+        add_tree_info(i, "IdK: " + ID->get_string(), messages);
+        if(expression)
+            this->expression->Eval(j, messages);
     }
 
     void node_var::Pull_back(std::deque<token_base *> &tokens) {
@@ -254,9 +305,13 @@ namespace cm {
 
     void node_simple_expression::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
-        additive_expression_1->Eval(j, messages);
+
         if (relop) {
+            relop->Eval(i, messages);
+            additive_expression_1->Eval(j, messages);
             additive_expression_2->Eval(j, messages);
+        } else {
+            additive_expression_1->Eval(i, messages);
         }
     }
 
@@ -270,7 +325,7 @@ namespace cm {
     }
 
     void node_relop::Eval(int i, std::deque<std::string> *messages) {
-        //tree
+        add_tree_info(i, "Op: " + RELOP->get_string(), messages);
     }
 
     void node_relop::Pull_back(std::deque<token_base *> &tokens) {
@@ -280,15 +335,12 @@ namespace cm {
     void node_additive_expression::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
 
-        term_1->Eval(j, messages);
-
-        auto add_iter = addop->begin();
-        auto term_iter = term->begin();
-
-        for (add_iter, term_iter; add_iter != addop->end(); add_iter++, term_iter++) {
-            (*add_iter)->Eval(j, messages);
-            (*term_iter)->Eval(j, messages);
+        if (!addop->empty()) {
+            support_recur_term(term_1, addop, term, i, messages);
+        } else {
+            term_1->Eval(i, messages);
         }
+
     }
 
     void node_additive_expression::Pull_back(std::deque<token_base *> &tokens) {
@@ -304,7 +356,7 @@ namespace cm {
     }
 
     void node_addop::Eval(int i, std::deque<std::string> *messages) {
-        //tree
+        add_tree_info(i, "Op: " + op->get_string(), messages);
     }
 
     void node_addop::Pull_back(std::deque<token_base *> &tokens) {
@@ -314,14 +366,10 @@ namespace cm {
     void node_term::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
 
-        this->factor_1->Eval(j, messages);
-
-        auto mul_iter = mulop->begin();
-        auto fac_iter = factor->begin();
-
-        for (mul_iter, fac_iter; mul_iter != mulop->end(); mul_iter++, fac_iter++) {
-            (*mul_iter)->Eval(j, messages);
-            (*fac_iter)->Eval(j, messages);
+        if(!mulop->empty()) {
+            support_recur_term(factor_1, mulop, factor, i, messages);
+        }else{
+            factor_1->Eval(i, messages);
         }
     }
 
@@ -340,6 +388,7 @@ namespace cm {
 
     void node_mulop::Eval(int i, std::deque<std::string> *messages) {
         //build tree
+        add_tree_info(i, "Op: " + op->get_string(), messages);
     }
 
     void node_mulop::Pull_back(std::deque<token_base *> &tokens) {
@@ -347,13 +396,27 @@ namespace cm {
     }
 
     void node_factor::Eval(int i, std::deque<std::string> *messages) {
+
         int j = i + 1;
         if (expression) {
             expression->Eval(j, messages);
-        } else if (factor_s) {
-            factor_s->Eval(j, messages);
+        } else if (ID) {
+            if(factor_s) {
+                if(reinterpret_cast<node_factor_s*>(factor_s)->LEFT_P)
+                {
+                    add_tree_info(i, "CallK", messages);
+                    add_tree_info(j, "IdK: " + ID->get_string(), messages);
+                    factor_s->Eval(j, messages);
+                }else if(reinterpret_cast<node_factor_s*>(factor_s)->expression){
+                    add_tree_info(i, "array", messages);
+                    add_tree_info(j, "IdK: " + ID->get_string(), messages);
+                }
+
+            }else{
+                add_tree_info(i, "IdK: " + ID->get_string(), messages);
+            }
         } else {
-            //tree
+            add_tree_info(i, "ConstK: " + NUM->get_string(), messages);
         }
     }
 
@@ -373,9 +436,9 @@ namespace cm {
     void node_factor_s::Eval(int i, std::deque<std::string> *messages) {
         int j = i + 1;
         if (expression) {
-            expression->Eval(j, messages);
+            expression->Eval(i, messages);
         } else if (args) {
-            args->Eval(j, messages);
+            args->Eval(i, messages);
         }
 
     }
@@ -395,8 +458,8 @@ namespace cm {
     }
 
     void node_args::Eval(int i, std::deque<std::string> *messages) {
-        int j = i + i;
-
+        int j = i + 1;
+        add_tree_info(i, "ArgsK", messages);
         if (expression_1) {
             expression_1->Eval(j, messages);
             for (auto iter = expression->begin(); iter != expression->end(); iter++) {

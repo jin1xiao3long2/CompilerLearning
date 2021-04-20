@@ -631,7 +631,6 @@ namespace cm {
         //(expression)?
         returnStmt->SEMICOLON = consume_token(signal_type::SEMICOLON);
         //';'
-
         return returnStmt;
     }
 
@@ -912,6 +911,7 @@ namespace cm {
                         //args
                         factorS->RIGHT_P = consume_token(signal_type::RIGHT_P);
                         //')'
+                        break;
                     }
                     default: {
                         return nullptr;
@@ -923,7 +923,6 @@ namespace cm {
                 return nullptr;
             }
         }
-
         return factorS;
     }
 

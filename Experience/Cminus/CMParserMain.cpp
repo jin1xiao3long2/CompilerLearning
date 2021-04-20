@@ -74,18 +74,18 @@ int main(int argc, char **argv) {
     lexer->Lex();
     std::deque<cm::token_base *> tokens = lexer->getTokens();
 
-    for(auto iter = tokens.begin(); iter != tokens.end(); iter++){
-        std::cout << "line : " << (*iter)->get_line()  << "  column : " << (*iter)->get_column() << " info :  " << (*iter)->get_show_info() << std::endl;
-    }
+//    for(auto iter = tokens.begin(); iter != tokens.end(); iter++){
+//        std::cout << "line : " << (*iter)->get_line()  << "  column : " << (*iter)->get_column() << " info :  " << (*iter)->get_show_info() << std::endl;
+//    }
 
 //    parse
     cm::Parser *parser = new cm::Parser(tokens);
-//    parser->parse();
+    parser->parse();
 
 
     //get string
-//    std::deque<std::string>* mes = parser->getMessages();
-//
+    std::deque<std::string>* mes = parser->getMessages();
+
 //    for(auto iter = mes->begin(); iter != mes->end(); iter++){
 //        std::cout << iter->data() << std::endl;
 //    }
